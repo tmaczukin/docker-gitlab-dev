@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 
 gitlab_stop() {
     (docker ps | grep " gitlab-dev " >/dev/null && docker stop gitlab-dev >/dev/null && echo "GITLAB development container stopped" ) || \
@@ -13,7 +13,9 @@ gitlab_start() {
 
     mkdir -p ${PWD}/src
 
+    TZ=${TZ:-"Europe/Warsaw"}
     docker run -d --name gitlab-dev \
+        -e TZ=${TZ}                 \
         -v ${PWD}/src:/home/dev/src \
         -p 127.0.0.99:80:3000       \
         tmaczukin/gitlab-dev        \
@@ -49,5 +51,8 @@ case "$1" in
         ;;
     *)
         echo "Usage: $0 (start|stop|enter)"
+        echo
+        echo -e "You can change used timezone by setting TZ environment variable before running start, eg.\n"
+        echo "  TZ=\"UTC\" ${0} start"
         ;;
 esac
