@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /home/dev/src/gitlab-runner
+CI_SERVER_URL=http://localhost:3000 bundle exec ./bin/setup

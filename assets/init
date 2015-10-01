@@ -1,0 +1,43 @@
+#!/bin/bash
+
+source /etc/rbenvrc
+
+if [ -d ${HOME}/bin ]; then
+    export PATH=${HOME}/bin:${PATH}
+fi
+
+sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
+echo $TZ | sudo tee /etc/timezone >/dev/null
+
+src_dir=/home/dev/src
+src_files=($(shopt -s nullglob; shopt -s dotglob; echo ${src_dir}/*))
+if [ ${#src_files[@]} -lt 1 ]; then
+    mkdir -p ${src_dir}
+    cd ${src_dir}
+    git clone https://gitlab.com/gitlab-org/gitlab-development-kit.git .
+    make
+fi
+
+case "$1" in
+    start)
+        cd ${src_dir}
+
+        rm -f postgresql/data/postmaster.pid \
+              postgresql/.s.PGSQL.5432.lock
+
+        bundle exec foreman start
+        ;;
+    *)
+        if [ -x $1 ]; then
+            $1
+        else
+            prog=$(which $1)
+            if [ -n "${prog}" ] ; then
+                shift 1
+                $prog $@
+            else
+                exit 255
+            fi
+        fi
+        ;;
+esac

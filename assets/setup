@@ -1,0 +1,55 @@
+#!/bin/bash
+
+apt-get install -y build-essential zlib1g-dev libssl-dev libreadline-dev \
+                   libyaml-dev libxml2-dev libxslt-dev libffi-dev        \
+                   libmysqlclient-dev
+
+apt-get install -y git supervisor net-tools vim
+
+# Install rbenv
+git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv
+mkdir -p /usr/local/rbenv/plugins
+git clone https://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build
+cd /usr/local/rbenv/plugins/ruby-build
+./install.sh
+
+echo "export RBENV_ROOT=\"/usr/local/rbenv\"" >> /etc/rbenvrc
+echo "export PATH=\"\$RBENV_ROOT/bin:\$PATH\"" >> /etc/rbenvrc
+echo "eval \"\$(rbenv init -)\"" >> /etc/rbenvrc
+echo "gem: --no-rdoc --no-ri" >> /etc/skel/.gemrc
+echo "gem: --no-rdoc --no-ri" >> /root/.gemrc
+echo "source /etc/rbenvrc" >> /etc/skel/.bashrc
+echo "source /etc/rbenvrc" >> /root/.bashrc
+
+export CONFIGURE_OPTS="--disable-install-doc"
+
+# Install ruby
+bash -l -c "source /etc/rbenvrc && rbenv install 2.1.6 && rbenv global 2.1.6 && gem install bundler"
+addgroup rbenv
+chgrp rbenv -R /usr/local/rbenv
+chmod g+w -R /usr/local/rbenv
+
+# Install gitlab stack
+apt-get install -y postgresql libpq-dev redis-server libicu-dev ed      \
+                   cmake g++ nodejs libkrb5-dev golang nginx pkg-config
+
+# Install phantomjs
+export PHANTOM_JS="phantomjs-1.9.8-linux-x86_64"
+cd /tmp
+wget -q "https://bitbucket.org/ariya/phantomjs/downloads/${PHANTOM_JS}.tar.bz2"
+tar -xvjf ${PHANTOM_JS}.tar.bz2
+mv ${PHANTOM_JS} /usr/local/share
+ln -s /usr/local/share/${PHANTOM_JS}/bin/phantomjs /usr/local/bin
+phantomjs --version
+
+# Add development user
+useradd -d /home/dev -m -s /bin/bash -G rbenv dev
+adduser dev sudo
+
+# Install gems
+sudo -u dev bash -l -c "source /etc/rbenvrc; git clone https://gitlab.com/gitlab-org/gitlab-development-kit.git /tmp/gdk; cd /tmp/gdk; make"
+
+# Cleanup
+apt-get clean
+rm -rf /tmp/*
+rm -rf /var/lib/apt/lists/*

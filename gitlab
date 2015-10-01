@@ -1,0 +1,53 @@
+#!/bin/bash
+
+gitlab_stop() {
+    (docker ps | grep " gitlab-dev " >/dev/null && docker stop gitlab-dev >/dev/null && echo "GITLAB development container stopped" ) || \
+        echo "No GITLAB development container to stop"
+
+    (docker ps -a | grep " gitlab-dev " >/dev/null && docker rm gitlab-dev >/dev/null && echo "GITLAB development container removed" ) || \
+        echo "No GITLAB development container to remove"
+}
+
+gitlab_start() {
+    gitlab_stop
+
+    mkdir -p ${PWD}/src
+
+    docker run -d --name gitlab-dev \
+        -v ${PWD}/src:/home/dev/src \
+        -p 127.0.0.99:80:3000       \
+        tmaczukin/gitlab-dev        \
+        start >/dev/null
+
+    echo -e "GITLAB development container started!\n"
+
+    echo "You must now setup and start gitlab:"
+    echo "./gitlab enter"
+    echo -e "gitlab-setup && gitlab-start\n"
+
+    echo "After that gitlab will be available at:"
+    echo "  url: http://127.0.0.99/"
+    echo " user: root"
+    echo " pass: 5iveL!fe"
+}
+
+gitlab_enter() {
+    docker ps | grep " gitlab-dev " >/dev/null || (echo "No GITLAB development container running"; exit 255)
+
+    docker exec -ti gitlab-dev /usr/local/bin/run_bash
+}
+
+case "$1" in
+    start)
+        gitlab_start
+        ;;
+    stop)
+        gitlab_stop
+        ;;
+    enter)
+        gitlab_enter
+        ;;
+    *)
+        echo "Usage: $0 (start|stop|enter)"
+        ;;
+esac

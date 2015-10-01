@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /home/dev/src/gitlab-runner
+bundle exec ./bin/runner
