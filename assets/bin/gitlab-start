@@ -1,4 +1,5 @@
 #!/bin/bash
 
 cd /home/dev/src/gitlab
+bundle install
 bundle exec foreman start -p4000

@@ -17,7 +17,7 @@ gitlab_start() {
     docker run -d --name gitlab-dev \
         -e TZ=${TZ}                 \
         -v ${PWD}/src:/home/dev/src \
-        -p 127.0.0.99:80:3000       \
+        -p 127.0.0.99:80:4000       \
         tmaczukin/gitlab-dev        \
         start >/dev/null
 
@@ -26,6 +26,8 @@ gitlab_start() {
     echo "You must now setup and start gitlab:"
     echo "./gitlab enter"
     echo -e "gitlab-setup && gitlab-start\n"
+
+    echo -e "WARNING: First run may take awhile\n"
 
     echo "After that gitlab will be available at:"
     echo "  url: http://127.0.0.99/"
@@ -42,6 +44,7 @@ gitlab_enter() {
 case "$1" in
     start)
         gitlab_start
+        gitlab_enter
         ;;
     stop)
         gitlab_stop
