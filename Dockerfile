@@ -20,10 +20,10 @@ COPY assets/run_bash /usr/local/bin/run_bash
 RUN chmod 755 /usr/local/bin/run_bash; chown root:root /usr/local/bin/run_bash
 
 COPY assets/bin/* /home/dev/bin/
-RUN chmod +x /home/dev/*
+RUN chmod +x /home/dev/bin/*
 
 USER dev
-WORKDIR /home/dev
+WORKDIR /home/dev/src
 
 ENTRYPOINT ["/usr/local/sbin/init"]
 CMD ["bash"]
