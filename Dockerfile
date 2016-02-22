@@ -9,7 +9,7 @@ RUN apt-get update;                         \
     apt-get install -y locales tzdata sudo; \
     sed -i "s|%sudo.*|%sudo ALL=NOPASSWD: ALL|" /etc/sudoers
 
-ARG RUBY_VERSION=2.2.4
+ARG RUBY_VERSION=2.1.8
 COPY assets/setup /setup
 RUN chmod 777 /setup; sync; /setup; rm /setup
 
