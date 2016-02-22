@@ -1,29 +1,26 @@
 FROM tmaczukin/debian
 MAINTAINER Tomasz Maczukin "tomasz@maczukin.pl"
 
-ENV LANG     pl_PL.UTF-8
-ENV LANGUAGE pl_PL.UTF-8
-ENV LC_ALL   pl_PL.UTF-8
-ENV TZ       Europe/Warsaw
-RUN apt-get install -y locales tzdata sudo;                   \
-    sed -i "s/^# pl_PL.UTF-8/pl_PL.UTF-8/" /etc/locale.gen;   \
-    sed -i "s|%sudo.*|%sudo ALL=NOPASSWD: ALL|" /etc/sudoers; \
-    locale-gen
+ENV TZ=UTC
+ENTRYPOINT ["/usr/local/sbin/init"]
+CMD ["bash"]
 
+RUN apt-get update;                         \
+    apt-get install -y locales tzdata sudo; \
+    sed -i "s|%sudo.*|%sudo ALL=NOPASSWD: ALL|" /etc/sudoers
+
+ARG RUBY_VERSION=2.2.4
 COPY assets/setup /setup
 RUN chmod 777 /setup; sync; /setup; rm /setup
 
 COPY assets/init /usr/local/sbin/init
-RUN chmod 755 /usr/local/sbin/init; chown root:root /usr/local/sbin/init
-
 COPY assets/run_bash /usr/local/bin/run_bash
-RUN chmod 755 /usr/local/bin/run_bash; chown root:root /usr/local/bin/run_bash
+COPY assets/bin/* /home/git/bin/
+RUN  chmod 755 /usr/local/sbin/init;          \
+     chown root:root /usr/local/sbin/init;    \
+     chmod 755 /usr/local/bin/run_bash;       \
+     chown root:root /usr/local/bin/run_bash; \
+     chmod +x /home/git/bin/*
 
-COPY assets/bin/* /home/dev/bin/
-RUN chmod +x /home/dev/bin/*
-
-USER dev
-WORKDIR /home/dev/src
-
-ENTRYPOINT ["/usr/local/sbin/init"]
-CMD ["bash"]
+USER git
+WORKDIR /home/git/src

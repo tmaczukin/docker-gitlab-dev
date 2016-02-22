@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd /home/dev/src/gitlab
+cd /home/git/src/gitlab
 bundle install
 bundle exec rake db:create dev:setup

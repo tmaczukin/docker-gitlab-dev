@@ -1,0 +1,52 @@
+#!/bin/bash
+
+GDK_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TZ=${TZ:-"UTC"}
+
+gdk_container_stop() {
+    docker ps    | grep " gdk" >/dev/null && docker stop gdk >/dev/null
+    docker ps -a | grep " gdk" >/dev/null && docker rm   gdk >/dev/null
+}
+
+gdk_container_start() {
+    gdk_container_stop
+
+    mkdir -p ${PWD}/src
+
+    docker run --rm -ti --name gdk  \
+        -e "TZ=${TZ}"               \
+        -v ${GDK_PATH}/src:/home/git/src \
+        -p 172.17.42.1:80:3000      \
+        -p 172.17.42.1:22222:22     \
+        tmaczukin/gitlab-dev        \
+        start
+}
+
+gdk_container_enter() {
+    (docker ps | grep " gdk" >/dev/null) || (echo "No GITLAB development container running"; exit 255)
+    docker exec -ti gdk /usr/local/bin/run_bash
+}
+
+gdk() {
+    case "$1" in
+        start)
+            gdk_container_start
+            ;;
+        stop)
+            gdk_container_stop
+            ;;
+        enter)
+            gdk_container_enter
+            ;;
+        cd)
+            path=${GDK_PATH}
+            if [ -n ${2} ]; then
+                path="${path}/${2}"
+            fi
+            cd $path
+            ;;
+        *)
+            echo "Usage: $0 (start|stop|enter|cd)"
+            ;;
+    esac
+}

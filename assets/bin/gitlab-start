@@ -1,7 +1,6 @@
 #!/bin/bash
 
-cd /home/dev/src/gitlab
+cd /home/git/src/gitlab
 bundle install
-RAILS_ENV=development bundle exec rake db:migrate
-RAILS_ENV=test bundle exec rake db:migrate
-bundle exec foreman start -p4000
+cd /home/git/src
+bundle exec foreman start

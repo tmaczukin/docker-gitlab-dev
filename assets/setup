@@ -2,13 +2,18 @@
 
 set -e
 
-apt-get update
+if [ -z ${RUBY_VERSION} ]; then
+    echo "Error! Ruby version not specified!"
+    exit 1
+else
+    echo "Building image with RUBY_VERSION=${RUBY_VERSION}"
+fi
 
+apt-get update
 apt-get install -y build-essential zlib1g-dev libssl-dev libreadline-dev \
                    libyaml-dev libxml2-dev libxslt-dev libffi-dev        \
-                   libmysqlclient-dev
-
-apt-get install -y git supervisor net-tools vim openssh-server openssh-client
+                   libmysqlclient-dev                                    \
+                   git net-tools openssh-server openssh-client
 
 # Install rbenv
 git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv
@@ -28,13 +33,13 @@ echo "source /etc/rbenvrc" >> /root/.bashrc
 export CONFIGURE_OPTS="--disable-install-doc"
 
 # Install ruby
-bash -l -c "source /etc/rbenvrc && rbenv install 2.1.7 && rbenv global 2.1.7 && gem install bundler"
+bash -l -c "source /etc/rbenvrc && rbenv install ${RUBY_VERSION} && rbenv global ${RUBY_VERSION} && gem install bundler"
 addgroup rbenv
 chgrp rbenv -R /usr/local/rbenv
 chmod g+w -R /usr/local/rbenv
 
 # Install gitlab stack
-apt-get install -y postgresql libpq-dev redis-server libicu-dev ed      \
+apt-get install -y postgresql libpq-dev redis-server libicu-dev ed \
                    cmake g++ nodejs libkrb5-dev golang nginx pkg-config
 
 # Install phantomjs
@@ -47,11 +52,11 @@ ln -s /usr/local/share/${PHANTOM_JS}/bin/phantomjs /usr/local/bin
 phantomjs --version
 
 # Add development user
-useradd -d /home/dev -m -s /bin/bash -G rbenv dev
-adduser dev sudo
+useradd -d /home/git -m -s /bin/bash -G rbenv git
+adduser git sudo
 
 # Install gems
-sudo -u dev bash -l -c "source /etc/rbenvrc; git clone https://gitlab.com/gitlab-org/gitlab-development-kit.git /tmp/gdk; cd /tmp/gdk; make"
+sudo -u git bash -l -c "source /etc/rbenvrc; git clone https://gitlab.com/gitlab-org/gitlab-development-kit.git /tmp/gdk; cd /tmp/gdk; make"
 
 # Cleanup
 apt-get clean
