@@ -7,8 +7,10 @@ if [ -d ${HOME}/bin ]; then
 fi
 
 gitlab_start() {
-    sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
     echo $TZ | sudo tee /etc/timezone >/dev/null
+    dpkg-reconfigure tzdata
+    sudo sed -i "s|^#\s*${LANG/\./\\.}|  ${LANG}|" /etc/locale.gen
+    sudo locale-gen
 
     src_dir=/home/git/src
     src_files=($(shopt -s nullglob; shopt -s dotglob; echo ${src_dir}/*))

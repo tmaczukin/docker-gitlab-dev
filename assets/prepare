@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+check_env() {
+    if [ -z ${2} ]; then
+        echo "Error! ${1} not specified!"
+        exit 1
+    else
+        echo "Building image with ${1}=${2}"
+    fi
+}
+
+check_env 'SETUP_LOCALE' ${SETUP_LOCALE}
+check_env 'TZ'           ${TZ}
+
+# Prepare system
+echo "APT::Install-Recommends 0;" >> /etc/apt/apt.conf.d/01norecommends
+echo "APT::Install-Suggests 0;"   >> /etc/apt/apt.conf.d/01norecommends
+
+apt-get update
+apt-get install -y locales tzdata sudo curl wget ca-certificates
+
+# Setup timezone
+echo $TZ > /etc/timezone
+dpkg-reconfigure tzdata
+
+# Setup locales
+sed -i "s|^#\s*${SETUP_LOCALE/\./\\.}|  ${SETUP_LOCALE}|" /etc/locale.gen
+export LANG=${SETUP_LOCALE}
+locale-gen
+
+# Setup sudo
+sed -i "s|%sudo.*|%sudo ALL=NOPASSWD: ALL|" /etc/sudoers
