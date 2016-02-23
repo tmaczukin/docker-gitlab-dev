@@ -50,3 +50,27 @@ gdk() {
             ;;
     esac
 }
+
+_gdk_comp() {
+    local cur prev opts base
+
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="start stop enter cd"
+
+    case "${prev}" in
+        cd)
+            compopt -o nospace
+            CDPATH=${GDK_PATH} _cd
+            return 0
+            ;;
+        *)
+            ;;
+    esac
+
+    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+    return 0
+}
+
+complete -F _gdk_comp gdk
