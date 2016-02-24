@@ -52,7 +52,7 @@ gdk() {
 }
 
 _gdk_comp() {
-    local cur prev opts base
+    local cur prev opts
 
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
@@ -61,8 +61,22 @@ _gdk_comp() {
 
     case "${prev}" in
         cd)
+            local -a tokens
+            local IFS=$'\n' x tmp quoted
+
             compopt -o nospace
-            CDPATH=${GDK_PATH} _cd
+
+            _quote_readline_by_ref "$cur" quoted
+            x=$(compgen -d -- "${GDK_PATH}/${quoted}") &&
+            while read -r tmp; do
+                tokens+=( "$(echo ${tmp} | sed "s|${GDK_PATH}/||")/" )
+            done <<< "${x}"
+
+            if [[ ${#tokens[@]} -ne 0 ]]; then
+                compopt -o filenames 2>/dev/null
+                COMPREPLY+=( "${tokens[@]}" )
+            fi
+
             return 0
             ;;
         *)
