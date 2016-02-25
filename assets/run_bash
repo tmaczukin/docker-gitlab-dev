@@ -6,4 +6,16 @@ fi
 
 export TERM=xterm
 
-/bin/bash
+if [ "$#" -gt 0 ]; then
+    source /etc/rbenvrc
+
+    prog=$(which $1)
+    if [ -n "${prog}" ]; then
+        shift 1
+        $prog $@
+    else
+        exit 255
+    fi
+else
+    /bin/bash
+fi

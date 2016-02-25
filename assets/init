@@ -28,9 +28,7 @@ gitlab_start() {
 
     echo -e "\033[31;1mGITLAB development container started!\033[37;0m\n"
 
-    echo "You can now setup and start gitlab."
-    echo -e "Run: \033[1mgitlab help\033[0m for more details"
-
+    echo "You can now setup and/or start gitlab."
 
     echo "Gitlab will be available at:"
     echo "  url: http://172.17.42.1/"

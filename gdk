@@ -1,11 +1,14 @@
 #!/bin/bash
 
+TZ=${TZ:-"Europe/Warsaw"}
 GDK_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-TZ=${TZ:-"UTC"}
+SRC_PATH="${GDK_PATH}/src"
+
+cont_name="gdk"
 
 gdk_container_stop() {
-    docker ps    | grep " gdk" >/dev/null && docker stop gdk >/dev/null
-    docker ps -a | grep " gdk" >/dev/null && docker rm   gdk >/dev/null
+    docker ps    | grep " ${cont_name}" >/dev/null && docker stop ${cont_name} >/dev/null
+    docker ps -a | grep " ${cont_name}" >/dev/null && docker rm   ${cont_name} >/dev/null
 }
 
 gdk_container_start() {
@@ -13,18 +16,29 @@ gdk_container_start() {
 
     mkdir -p ${PWD}/src
 
-    docker run --rm -ti --name gdk  \
-        -e "TZ=${TZ}"               \
-        -v ${GDK_PATH}/src:/home/git/src \
-        -p 172.17.42.1:80:3000      \
-        -p 172.17.42.1:22222:22     \
-        tmaczukin/gitlab-dev        \
+    docker run --rm -ti --name ${cont_name} \
+        -e "TZ=${TZ}"                       \
+        -v ${GDK_PATH}/src:/home/git/src    \
+        -p 172.17.42.1:80:3000              \
+        -p 172.17.42.1:22222:22             \
+        tmaczukin/gitlab-dev                \
         start
 }
 
+_is_gdk_container_running() {
+    (docker ps | grep " ${cont_name}" >/dev/null) || (echo "No GITLAB development container running"; exit 255)
+}
+
+gdk_container_run() {
+    if [ ! _is_gdk_container_running ]; then
+        return 0
+    fi
+
+    docker exec -ti ${cont_name} /usr/local/bin/run_bash $@
+}
+
 gdk_container_enter() {
-    (docker ps | grep " gdk" >/dev/null) || (echo "No GITLAB development container running"; exit 255)
-    docker exec -ti gdk /usr/local/bin/run_bash
+    gdk_container_run
 }
 
 gdk() {
@@ -38,15 +52,28 @@ gdk() {
         enter)
             gdk_container_enter
             ;;
+        run)
+            shift 1
+            gdk_container_run $@
+            ;;
+        redis_on_running)
+            gdk_container_run foreman start redis
+            ;;
+        pg_on_running)
+            gdk_container_run foreman start postgresql
+            ;;
         cd)
-            path=${GDK_PATH}
+            path=${SRC_PATH}
             if [ -n ${2} ]; then
                 path="${path}/${2}"
             fi
             cd $path
             ;;
+        refresh)
+            source ${BASH_SOURCE[0]}
+            ;;
         *)
-            echo "Usage: $0 (start|stop|enter|cd)"
+            exit 0
             ;;
     esac
 }
@@ -57,7 +84,7 @@ _gdk_comp() {
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="start stop enter cd"
+    opts="start stop enter run redis_on_running pg_on_running cd refresh"
 
     case "${prev}" in
         cd)
@@ -67,9 +94,9 @@ _gdk_comp() {
             compopt -o nospace
 
             _quote_readline_by_ref "$cur" quoted
-            x=$(compgen -d -- "${GDK_PATH}/${quoted}") &&
+            x=$(compgen -d -- "${SRC_PATH}/${quoted}") &&
             while read -r tmp; do
-                tokens+=( "$(echo ${tmp} | sed "s|${GDK_PATH}/||")/" )
+                tokens+=( "$(echo ${tmp} | sed "s|${SRC_PATH}/||")/" )
             done <<< "${x}"
 
             if [[ ${#tokens[@]} -ne 0 ]]; then

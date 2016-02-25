@@ -59,8 +59,22 @@ mv ${PHANTOM_JS_VERSION} /usr/local/share
 ln -s /usr/local/share/${PHANTOM_JS_VERSION}/bin/phantomjs /usr/local/bin
 phantomjs --version
 
-# Install gems
-sudo -u git bash -l -c "source /etc/rbenvrc; git clone https://gitlab.com/gitlab-org/gitlab-development-kit.git /tmp/gdk; cd /tmp/gdk; make"
+# Install gems and basic GitLab software
+mkdir -p /tmp/gitlab-ce
+curl -q https://gitlab.com/gitlab-org/gitlab-ce/raw/master/Gemfile > /tmp/gitlab-ce/Gemfile
+sudo -u git bash -l -c "source /etc/rbenvrc; cd /tmp/gitlab-ce; bundle install --without mysql production --jobs 4"
+
+mkdir -p /tmp/gitlab-shell
+curl -q https://gitlab.com/gitlab-org/gitlab-shell/raw/master/Gemfile > /tmp/gitlab-shell/Gemfile
+sudo -u git bash -l -c "source /etc/rbenvrc; cd /tmp/gitlab-shell; bundle install --without mysql production --jobs 4"
+
+mkdir -p /tmp/gdk
+curl -q https://gitlab.com/gitlab-org/gitlab-development-kit/raw/master/Gemfile > /tmp/gdk/Gemfile
+sudo -u git bash -l -c "source /etc/rbenvrc; cd /tmp/gdk; bundle install --jobs 4"
+
+git clone https://gitlab.com/gitlab-org/gitlab-workhorse.git /tmp/gitlab-workhorse
+cd /tmp/gitlab-workhorse
+make
 
 # Cleanup
 apt-get clean

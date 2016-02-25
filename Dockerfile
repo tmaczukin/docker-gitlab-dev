@@ -13,14 +13,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=$TZ
 
 COPY assets/prepare /prepare
-RUN  chmod 777 /prepare; sync; /prepare; rm /prepare
+RUN  chmod 777 /prepare; sync; /prepare
 
 ENV LANG=$SETUP_LOCALE
 ENV LC_ALL=$SETUP_LOCALE
 ENV LANGUAGE=$SETUP_LOCALE
 
 COPY assets/setup /setup
-RUN  chmod 777 /setup; sync; /setup; rm /setup
+RUN  chmod 777 /setup; sync; /setup
 
 COPY assets/init     /usr/local/sbin/init
 COPY assets/run_bash /usr/local/bin/run_bash
