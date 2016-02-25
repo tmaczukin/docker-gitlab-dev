@@ -12,15 +12,20 @@ ARG TZ=Europe/Warsaw
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=$TZ
 
-COPY assets/prepare /prepare
-RUN  chmod 777 /prepare; sync; /prepare
+RUN mkdir /setup
+
+COPY assets/prepare /setup/prepare
+RUN  chmod 777 /setup/prepare; sync; /setup/prepare
 
 ENV LANG=$SETUP_LOCALE
 ENV LC_ALL=$SETUP_LOCALE
 ENV LANGUAGE=$SETUP_LOCALE
 
-COPY assets/setup /setup
-RUN  chmod 777 /setup; sync; /setup
+COPY assets/setup /setup/setup
+RUN  chmod 777 /setup/setup; sync; /setup/setup
+
+COPY assets/install_gitlab /setup/install_gitlab
+RUN  chmod 777 /setup/install_gitlab; sync; /setup/install_gitlab
 
 COPY assets/init     /usr/local/sbin/init
 COPY assets/run_bash /usr/local/bin/run_bash
