@@ -5,4 +5,4 @@ image = $(vendor)/$(name)
 
 build:
 	@docker build --rm -t $(image):latest .
-	@docker tag -f $(image):latest $(image):$(version)
+	@docker tag $(image):latest $(image):$(version)

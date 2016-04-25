@@ -12,6 +12,9 @@ gitlab_start() {
     sudo sed -i "s|^#\s*${LANG/\./\\.}|  ${LANG}|" /etc/locale.gen
     sudo locale-gen
 
+    echo "PATH=$PATH" | sudo tee /etc/environment
+    sudo service ssh start
+
     src_dir=/home/git/src
     src_files=($(shopt -s nullglob; shopt -s dotglob; echo ${src_dir}/*))
     if [ ${#src_files[@]} -lt 1 ]; then
@@ -25,6 +28,8 @@ gitlab_start() {
 
     rm ${src_dir}/postgresql/.s.PGSQL*
     rm ${src_dir}/postgresql/data/postmaster.pid
+
+    ln -s ${src_dir}/.ssh /home/git/.ssh
 
     echo -e "\033[31;1mGITLAB development container started!\033[37;0m\n"
 

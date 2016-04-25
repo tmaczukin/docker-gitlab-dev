@@ -3,4 +3,5 @@
 cd /home/git/src/gitlab
 bundle install
 cd /home/git/src
+bundle install
 bundle exec foreman start

@@ -21,8 +21,9 @@ apt-get install -y build-essential zlib1g-dev libssl-dev libreadline-dev \
                    git net-tools openssh-server openssh-client
 
 # Install gitlab stack
-apt-get install -y postgresql libpq-dev redis-server libicu-dev ed cmake \
-                   g++ nodejs libkrb5-dev golang nginx pkg-config
+apt-get install -y postgresql postgresql-contrib libpq-dev redis-server \
+                   libicu-dev ed cmake g++ nodejs libkrb5-dev golang    \
+                   nginx pkg-config
 
 # Install rbenv
 git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv
