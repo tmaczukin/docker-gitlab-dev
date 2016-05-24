@@ -16,12 +16,12 @@ gdk_container_start() {
 
     mkdir -p ${PWD}/src
 
-    docker run --rm -ti --name ${cont_name} \
-        -e "TZ=${TZ}"                       \
-        -v ${GDK_PATH}/src:/home/git/src    \
-        -p 172.17.0.1:80:3000               \
-        -p 172.17.0.1:22222:22              \
-        tmaczukin/gitlab-dev                \
+    docker run --rm -ti --name ${cont_name}      \
+        -e "TZ=${TZ}"                            \
+        -v ${GDK_PATH}/src:/home/git/src         \
+        -p 172.17.0.1:80:3000                    \
+        -p 172.17.0.1:22222:22                   \
+        registry.gitlab.com/tmaczukin/docker-gdk \
         start
 }
 

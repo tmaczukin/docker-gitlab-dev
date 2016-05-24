@@ -1,0 +1,10 @@
+service:
+  - docker:1.11-dind
+
+build:
+  image: docker:1.11
+  script:
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN
+  - make build
+  - make publish
+  - docker logout
