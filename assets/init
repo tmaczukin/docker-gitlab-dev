@@ -36,7 +36,7 @@ gitlab_start() {
     echo "You can now setup and/or start gitlab."
 
     echo "Gitlab will be available at:"
-    echo "  url: http://172.17.42.1/"
+    echo "  url: http://172.17.0.1/"
     echo " user: root"
     echo " pass: 5iveL!fe"
 

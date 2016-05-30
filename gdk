@@ -18,6 +18,8 @@ gdk_container_start() {
 
     docker run --rm -ti --name ${cont_name}      \
         -e "TZ=${TZ}"                            \
+        -e "host=0.0.0.0"                        \
+        -e "port=3000"                           \
         -v ${GDK_PATH}/src:/home/git/src         \
         -p 172.17.0.1:80:3000                    \
         -p 172.17.0.1:22222:22                   \
