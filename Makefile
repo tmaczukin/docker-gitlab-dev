@@ -12,6 +12,6 @@ build:
 
 publish:
 	# Pushing $(image):latest
-	@docker push $(image):latest
+	@time docker push $(image):latest
 	# Pushing $(image):$(version)
-	@docker push $(image):$(version)
+	@time docker push $(image):$(version)
