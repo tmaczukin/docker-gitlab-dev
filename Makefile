@@ -4,6 +4,9 @@ vendor = tmaczukin
 registry = registry.gitlab.com
 image = $(registry)/$(vendor)/$(name)
 
+show_version:
+	@echo "Version: $(version)"
+
 build:
 	# Building $(image):latest
 	@docker build --rm -t $(image):latest .
