@@ -6,6 +6,9 @@ fi
 
 export TERM=xterm
 
+alias brspec="bundle exec rspec --format=documentation"
+alias brake="bundle exec rake"
+
 if [ "$#" -gt 0 ]; then
     source /etc/rbenvrc
 

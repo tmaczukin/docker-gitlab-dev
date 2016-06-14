@@ -4,7 +4,7 @@ build:
   image: docker:1.11
   script:
   - apk add -U make git
-  - docker login --username gitlab-ci-token --password $CI_BUILD_TOKEN registry.gitlab.com
   - make build
+  - docker login --username gitlab-ci-token --password $CI_BUILD_TOKEN registry.gitlab.com
   - make publish
   - docker logout
