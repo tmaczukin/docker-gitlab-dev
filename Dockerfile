@@ -4,7 +4,7 @@ MAINTAINER Tomasz Maczukin "tomasz@maczukin.pl"
 ENTRYPOINT ["/usr/local/sbin/init"]
 CMD ["bash"]
 
-ARG RUBY_VERSION=2.1.8
+ARG RUBY_VERSION=2.3.1
 ARG PHANTOM_JS_VERSION=phantomjs-1.9.8-linux-x86_64
 ARG SETUP_LOCALE=pl_PL.UTF-8
 ARG TZ=Europe/Warsaw
