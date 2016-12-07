@@ -59,11 +59,11 @@ gdk() {
             shift 1
             gdk_container_run $@
             ;;
-        redis_on_running)
-            gdk_container_run foreman start redis
+        app)
+            gdk_container_run ./run app
             ;;
-        pg_on_running)
-            gdk_container_run foreman start postgresql
+        db)
+            gdk_container_run ./run db
             ;;
         cd)
             path=${SRC_PATH}
