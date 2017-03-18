@@ -2,7 +2,7 @@
 
 TZ=${TZ:-"Europe/Warsaw"}
 GDK_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SRC_PATH="${GDK_PATH}/src"
+SRC_PATH="${GDK_PATH}/data"
 VERSION=$(cd ${GDK_PATH} && git describe | sed "s|^v||")
 
 cont_name="gdk"
@@ -15,15 +15,16 @@ gdk_container_stop() {
 gdk_container_start() {
     gdk_container_stop
 
-    mkdir -p ${PWD}/src
+    mkdir -p ${GDK_PATH}
 
-    docker run --rm -ti --name ${cont_name}      \
-        -e "TZ=${TZ}"                            \
-        -e "host=0.0.0.0"                        \
-        -e "port=3000"                           \
-        -v ${GDK_PATH}/src:/home/git/src         \
-        -p 172.17.0.1:80:3000                    \
-        -p 172.17.0.1:22222:22                   \
+    docker run --rm -ti --name ${cont_name}                 \
+        -e "TZ=${TZ}"                                       \
+        -e "host=0.0.0.0"                                   \
+        -e "port=3000"                                      \
+        -v ${GDK_PATH}/src:/home/gdk/gitlab-development-kit \
+        -p 172.17.0.1:80:3000                               \
+        -p 172.17.0.1:22222:22                              \
+        -p 172.17.0.1:9100:9100                             \
         registry.gitlab.com/tmaczukin/docker-gdk:${VERSION} \
         start
 }
@@ -37,7 +38,7 @@ gdk_container_run() {
         return 0
     fi
 
-    docker exec -ti ${cont_name} /usr/local/bin/run_bash $@
+    docker exec -ti ${cont_name} $@
 }
 
 gdk_container_enter() {

@@ -1,10 +1,12 @@
 build:
+  variables:
+    DOCKER_DRIVER: overlay
   services:
   - docker:1.11-dind
   image: docker:1.11
   script:
   - apk add -U make git
-  - make build
-  - docker login --username gitlab-ci-token --password $CI_BUILD_TOKEN registry.gitlab.com
-  - make publish
-  - docker logout
+  - make build image=$CI_REGISTRY_IMAGE
+  - docker login --username gitlab-ci-token --password $CI_BUILD_TOKEN $CI_REGISTRY
+  - make publish image=$CI_REGISTRY_IMAGE
+  - docker logout $CI_REGISTRY

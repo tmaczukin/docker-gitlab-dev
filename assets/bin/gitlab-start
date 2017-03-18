@@ -1,7 +1,0 @@
-#!/bin/bash
-
-cd /home/git/src/gitlab
-bundle install
-cd /home/git/src
-bundle install
-./run

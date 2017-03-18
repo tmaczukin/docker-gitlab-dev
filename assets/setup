@@ -12,18 +12,21 @@ check_env() {
 }
 
 check_env 'RUBY_VERSION' ${RUBY_VERSION}
-check_env 'PHANTOM_JS_VERSION' ${PHANTOM_JS_VERSION}
 
 # Prepare system for rbenv and ruby
-apt-get install -y build-essential zlib1g-dev libssl-dev libreadline-dev \
-                   libyaml-dev libxml2-dev libxslt-dev libffi-dev        \
-                   libmysqlclient-dev                                    \
-                   git net-tools openssh-server openssh-client
+apt-get install -y curl build-essential zlib1g-dev libssl-dev libreadline-dev \
+                   libyaml-dev libxml2-dev libxslt-dev libffi-dev             \
+                   libmysqlclient-dev git net-tools openssh-server            \
+                   openssh-client autoconf
+
+# Install node
+curl -sL https://deb.nodesource.com/setup_7.x | bash -
+apt-get install -y nodejs
 
 # Install gitlab stack
 apt-get install -y postgresql postgresql-contrib libpq-dev redis-server \
                    libicu-dev ed cmake g++ nodejs libkrb5-dev golang    \
-                   nginx pkg-config
+                   nginx pkg-config libsqlite3-dev
 
 # Install rbenv
 git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv
@@ -48,17 +51,9 @@ useradd -d /home/git -m -s /bin/bash -G rbenv git
 adduser git sudo
 
 # Install ruby
-bash -l -c "source /etc/rbenvrc && rbenv install ${RUBY_VERSION} && rbenv global ${RUBY_VERSION} && gem install bundler"
+bash -l -c "source /etc/rbenvrc && rbenv install ${RUBY_VERSION} && rbenv global ${RUBY_VERSION} && gem install bundler foreman"
 chgrp rbenv -R /usr/local/rbenv
 chmod g+w   -R /usr/local/rbenv
-
-# Install phantomjs
-cd /tmp
-wget -q "https://bitbucket.org/ariya/phantomjs/downloads/${PHANTOM_JS_VERSION}.tar.bz2"
-tar -xvjf ${PHANTOM_JS_VERSION}.tar.bz2
-mv ${PHANTOM_JS_VERSION} /usr/local/share
-ln -s /usr/local/share/${PHANTOM_JS_VERSION}/bin/phantomjs /usr/local/bin
-phantomjs --version
 
 # Cleanup
 apt-get clean
